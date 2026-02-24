@@ -11,6 +11,18 @@ struct pos
     const char *filename;
 };
 
+#define NUMERIC_CASE \
+    case '0':        \
+    case '1':        \
+    case '2':        \
+    case '3':        \
+    case '4':        \
+    case '5':        \
+    case '6':        \
+    case '7':        \
+    case '8':        \
+    case '9'
+
 enum
 {
     LEXICAL_ANALYSIS_ALL_OK,
@@ -23,6 +35,8 @@ enum
     TOKEN_TYPE_KEYWORD,
     TOKEN_TYPE_OPERATOR,
     TOKEN_TYPE_SYMBOL,
+    TOKEN_TYPE_NUMBER,
+    TOKEN_TYPE_STRING,
     TOKEN_TYPE_COMMENT,
     TOKEN_TYPE_NEWLINE
 };
@@ -32,6 +46,7 @@ struct token
 
     int type;
     int flags;
+    struct pos pos;
 
     union
     {
@@ -83,7 +98,7 @@ struct compile_process
 {
     // flags用于指示如何编译这个文件，虽然我也没看明白
     int flags;
-
+    struct pos pos;
     struct compile_process_input_file
     {
         FILE *fp;
@@ -104,5 +119,9 @@ struct lex_process *lex_process_create(struct compile_process *compiler, struct 
 void lex_process_free(struct lex_process *process);
 void *lex_process_private(struct lex_process *process);
 struct vector *lex_process_tokens(struct lex_process *process);
+int lex(struct lex_process *process);
+
+void compiler_error(struct compile_process *compiler, const char *msg, ...);
+void compile_warning(struct compile_process *compiler, const char *msg, ...);
 
 #endif

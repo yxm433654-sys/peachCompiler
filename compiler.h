@@ -3,7 +3,10 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
+#define S_EQ(str, str2) \
+    (str && str2 && (strcmp(str, str2) == 0))
 struct pos
 {
     int line;
@@ -23,22 +26,69 @@ struct pos
     case '8':        \
     case '9'
 
+#define OPERATOR_CASE_ECCLUDING_DIVISION \
+    case '+':                            \
+    case '-':                            \
+    case '*':                            \
+    case '>':                            \
+    case '<':                            \
+    case '^':                            \
+    case '%':                            \
+    case '!':                            \
+    case '=':                            \
+    case '~':                            \
+    case '|':                            \
+    case '&':                            \
+    case '(':                            \
+    case '[':                            \
+    case ',':                            \
+    case '.':                            \
+    case '?'
+
+#define SYMBOL_CASE \
+    case '{':       \
+    case '}':       \
+    case ';':       \
+    case '#':       \
+    case '\\':      \
+    case ')':       \
+    case ']'
+
 enum
 {
     LEXICAL_ANALYSIS_ALL_OK,
     LEXICAL_ANALYSIS_INPUT_ERROR
 };
 
+// 枚举token的类型
+// token的类型应该有哪些：
+/*
+    关键字
+    标识符
+    字面量(常量)：数字、字符、字符串
+    操作符
+    分隔符： ； { } ' "
+    注释：单行注释、多行注释
+    空白：空格、tab、换行
+    未定义标记
+*/
 enum
 {
-    TOKEN_TYPE_IDENTIFIER,
-    TOKEN_TYPE_KEYWORD,
-    TOKEN_TYPE_OPERATOR,
-    TOKEN_TYPE_SYMBOL,
-    TOKEN_TYPE_NUMBER,
-    TOKEN_TYPE_STRING,
-    TOKEN_TYPE_COMMENT,
-    TOKEN_TYPE_NEWLINE
+    TOKEN_TYPE_IDENTIFIER, // 标识符
+    TOKEN_TYPE_KEYWORD,    // 关键字
+    TOKEN_TYPE_OPERATOR,   // 操作符
+    TOKEN_TYPE_SYMBOL,     //
+    TOKEN_TYPE_NUMBER,     // 数值
+    TOKEN_TYPE_STRING,     // 字符串
+    TOKEN_TYPE_COMMENT,    // 注释
+    TOKEN_TYPE_NEWLINE     // 换行
+};
+
+enum{
+    NUMBER_TYPE_NORMAL,
+    NUMBER_TYPE_LONG,
+    NUMBER_TYPE_FLOAT,
+    NUMBER_TYPE_DOUBLE,
 };
 
 struct token
@@ -50,19 +100,26 @@ struct token
 
     union
     {
-        char cval;
-        const char *sval;
-        unsigned int inum;
-        unsigned long lnum;
-        unsigned long long llnum;
-        void *any;
+        char cval;        // char
+        const char *sval; // string
+
+        unsigned int inum;        // int
+        unsigned long lnum;       // long int
+        unsigned long long llnum; // long long int
+
+        void *any; // undefined
     };
 
-    bool whitespace;
+    struct token_number
+    {
+        int type;
+    }num;
 
-    const char *between_brackets;
+    bool whitespace; // 空白
+
+    const char *between_brackets; // 括号
 };
-
+// 函数指针类型
 struct lex_process;
 typedef char (*LEX_PROCESS_NEXT_CHAR)(struct lex_process *process);
 typedef char (*LEX_PROCESS_PEEK_CHAR)(struct lex_process *process);
@@ -103,11 +160,12 @@ struct compile_process
     {
         FILE *fp;
         const char *abs_path;
-        /* data */
     } cfile;
-
+    //用于词法分析
+    struct vector* token_vec;
     FILE *ofile;
 };
+
 int compile_file(const char *filename, const char *out_filename, int flag);
 struct compile_process *compile_process_create(const char *filename, const char *filename_out, int flags);
 
@@ -123,5 +181,10 @@ int lex(struct lex_process *process);
 
 void compiler_error(struct compile_process *compiler, const char *msg, ...);
 void compile_warning(struct compile_process *compiler, const char *msg, ...);
+
+//builds token for the input string.
+struct lex_process* tokens_build_for_string(struct compile_process* compiler, const char* str);
+
+bool token_is_keyword(struct token *token, const char *value);
 
 #endif

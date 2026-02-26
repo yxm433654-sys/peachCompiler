@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "compiler.h"
 
+// compile_process_create就是初始化process，传入的文件名称，编译后的文件名称，以何种方式编译
 struct compile_process *compile_process_create(const char *filename, const char *filename_out, int flags)
 {
     FILE *file = fopen(filename, "r");

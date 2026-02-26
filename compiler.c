@@ -32,8 +32,8 @@ int compile_file(const char *filename, const char *out_filename, int flags)
     struct compile_process *process = compile_process_create(filename, out_filename, flags);
     if (!process)
         return COMPILER_FAILED_WITH_ERRORS;
-
-    // preform lexical analysis
+    // 到这一步就是把入口准备好了，process携带要编译的文件信息进入编译过程，下一步是词法分析...
+    //  preform lexical analysis
     struct lex_process *lex_process = lex_process_create(process, &compiler_lex_functions, NULL);
     if (!lex_process)
     {
@@ -43,6 +43,9 @@ int compile_file(const char *filename, const char *out_filename, int flags)
     {
         return COMPILER_FAILED_WITH_ERRORS;
     }
+
+    process->token_vec = lex_process->token_vec;
+    
     // preform parsing
 
     // preform code generation

@@ -1,4 +1,1 @@
-int main()
-{
-    return 0;
-}
+int  hhhh = 77787;

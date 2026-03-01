@@ -512,8 +512,7 @@ void lexer_validate_binary_string(const char *str)
     }
 }
 
-struct token *
-token_make_special_number_binary()
+struct token* token_make_special_number_binary()
 {
     // skip the b
     nextc();
@@ -677,5 +676,6 @@ struct lex_process* tokens_build_for_string(struct compile_process* compiler, co
     {
         return NULL;
     }
+    
     return lex_process;
 }

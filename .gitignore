@@ -1,0 +1,12 @@
+
+.build/
+*.log
+
+//目标文件不上传
+*.o
+
+.vscode/
+
+./test
+
+./main

@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "compiler.h"
+#include "./helpers/vector.h"
+
+
+
 
 // compile_process_create就是初始化process，传入的文件名称，编译后的文件名称，以何种方式编译
 struct compile_process *compile_process_create(const char *filename, const char *filename_out, int flags)
@@ -24,6 +28,9 @@ struct compile_process *compile_process_create(const char *filename, const char 
     }
 
     struct compile_process *process = calloc(1, sizeof(struct compile_process));
+    
+    process->node_vec = vector_create(sizeof(struct node*));
+    process->node_tree_vec = vector_create(sizeof(struct node*));
     process->flags = flags;
     process->cfile.fp = file;
     process->ofile = out_file;
